@@ -1,77 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title></title>
-<link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
-<script src="js/jquery-3.2.1.min.js"></script>
-<script src="js/lunaradio.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Player Rádio Diversidade</title>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+    --cor-fundo-caixinha: #26163b;
+    --cor-botoes-player: #d4d4d4;
+    --cor-texto-player: #ffffff;
+    --cor-borda-player: #d4d4d4;
+    --fonte-frase: 'Open Sans', sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { 
+    margin: 0; 
+    padding: 0; 
+    background-color: transparent !important;
+}
+
+.player-container {
+    background-color: var(--cor-fundo-caixinha);
+    color: var(--cor-texto-player);
+    border: 2px solid var(--cor-borda-player);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%; 
+    position: relative;
+    min-height: 400px;
+    padding-bottom: 70px; 
+    overflow: hidden;
+}
+
+.player-logo {
+    background-image: url('https://raw.githubusercontent.com/radio-diversidade-poa/player_radio_diversidade_poa_listen2myradio/main/images/logo/logo_radio_250.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 50%;
+    width: 130px;
+    height: 130px;
+    margin: 1rem 0;
+    display: block;
+}
+
+.player-phrase {
+    font-family: var(--fonte-frase);
+    width: 100%;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+.player-audio { 
+    width: 100%; 
+    max-width: 600px; 
+    z-index: 2; 
+    position: relative; 
+}
+
+.classificacao-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+    margin-bottom: 5px;
+    z-index: 2;
+    position: relative;
+}
+
+.selo-l { width: 22px; height: 22px; border-radius: 3px; }
+
+.classificacao-texto {
+    font-family: var(--fonte-frase);
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+#audioVisualizer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 65px;
+    z-index: 1;
+}
+</style>
 </head>
+<body>
+<div class="player-container">
+    <div class="player-logo"></div>
+    <div class="player-phrase"><span>Clique e ouça!<br>Rádio Diversidade Poa</span></div>
+    <audio id="radioPlayer" autoplay controls class="player-audio" src="http://stm1.uniservstm.stream:6732"></audio>
+    <div class="classificacao-container">
+        <img src="https://raw.githubusercontent.com/radio-diversidade-poa/player_radio_diversidade_poa_listen2myradio/main/images/selo-livre.png" alt="L" class="selo-l">
+        <span class="classificacao-texto">Classificação Indicativa: Livre</span>
+    </div>
+    <canvas id="audioVisualizer"></canvas>
+</div>
 
-<body style="margin:0px">
+<script>
+const radioPlayer = document.getElementById('radioPlayer');
 
-<div id="lunaradio" style='width:100%; height:100%;background-image: url("img/fondo.jpg"); background-repeat: no-repeat; background-size: cover; background-position: center;
--webkit-border-top-left-radius: 0px;
-  -webkit-border-top-right-radius: 0px;
-  -webkit-border-bottom-right-radius: 0px;
-  -webkit-border-bottom-left-radius: 0px;
-  -moz-border-radius-topleft: 0px;
-  -moz-border-radius-topright: 0px;
-  -moz-border-radius-bottomright: 0px;
-  -moz-border-radius-bottomleft: 0px;
-  border-top-left-radius: 0px;
-  border-top-right-radius: 0px;
-  border-bottom-right-radius: 0px;
-  border-bottom-left-radius: 0px;
-  border: none;'>
-<div a href="RADIO STUDIO" title="RADIO STUDIO"></a> Desarrollado por: DIVERSIDADE POA <a href="CHAN" title="DIVERSIDADE POA"></a></div>
+// FUNÇÃO DE RECONEXÃO AUTOMÁTICA (O VIGIA)
+function tentarReconectar() {
+    setTimeout(() => {
+        console.log("Tentando recuperar o sinal da rádio...");
+        // Recarrega o link puro para limpar qualquer travamento de buffer
+        const srcAtual = radioPlayer.src;
+        radioPlayer.src = "";
+        radioPlayer.src = srcAtual;
+        radioPlayer.load();
+        radioPlayer.play().catch(e => console.log("Aguardando rede para dar play..."));
+    }, 3000); // Espera 3 segundos para a internet respirar e reconecta
+}
 
+// Escuta se o fluxo parou por erro de rede
+radioPlayer.addEventListener('error', tentarReconectar);
 
-<script src="js/jquery-3.2.1.min.js" type="3bc5e4e5245e387f3290c38f-text/javascript"></script>
-<script src="js/lunaradio.min.js" type="3bc5e4e5245e387f3290c38f-text/javascript"></script>
-
-<div id="lunaradio" style="width:100%; height:550px;"></div>
-
-<script type="3bc5e4e5245e387f3290c38f-text/javascript">
-$("#lunaradio").lunaradio({
-	
-	userinterface: "big",
-	backgroundcolor: "rgba(9,15,25,0.8)",
-	fontcolor: "#ffffff",
-	hightlightcolor: "#7427a9",
-	fontname: "Saira Condensed",
-	googlefont: "Saira+Condensed:wght@100",
-	fontratio: "0.3",
-	radioname: "A maior diversidade de ritmos!",
-	scroll: "true",
-	coverimage: "https://github.com/radio-diversidade-poa/radio-player/blob/main/logo_radio_250.png?raw=true",
-	usevisualizer: "fake",
-	coverstyle: "animated",
-	visualizertype: "6",
-	multicolorvisualizer: "true",
-    color1: "7427a9",
-    color2: "7427a9",
-    color3: "7427a9",
-    color4: "#7427a9",
-	itunestoken: "1000lIPN",
-	metadatatechnic: "corsproxy",
-	ownmetadataurl: "",
-	streamurl: "https://fpsnew1.listen2myradio.com:2199/listen.php?ip=82.145.63.6&port=4294&type=ice&mount=stream",
-	streamtype: "shoutcast1",
-	icecastmountpoint: "",
-	radionomyid: "",
-	radionomyapikey: "",
-	radiozenoid: "",
-	radiojarid: "",
-	radiocoid: "",
-	shoutcastpath: "/;",
-	shoutcastid: "1",
-	streamsuffix: "",
-	metadatainterval: "20000",
-	volume: "85",
-	debug: "false",
-	usestreamcorsproxy: "false", 
-	corsproxy: "https://corsradio.herokuapp.com/index.php?q=",
-	autoplay:"true",
+// Escuta se o player ficou mudo ou parado esperando dados
+radioPlayer.addEventListener('waiting', () => {
+    // Força o play se ele ficar congelado em modo de espera
+    radioPlayer.play().catch(e => console.log("Aguardando buffer..."));
 });
-</script>					
-<script src="https://ajax.cloudflare.com/cdn-cgi/scripts/7089c43e/cloudflare-static/rocket-loader.min.js" data-cf-settings="3bc5e4e5245e387f3290c38f-|49" defer=""></script>
+
+// Mantido por segurança para o caso do servidor reiniciar do zero
+radioPlayer.addEventListener('ended', tentarReconectar);
+
+const canvas = document.getElementById('audioVisualizer');
+const ctx = canvas.getContext('2d');
+function resizeCanvas() { 
+    canvas.width = canvas.clientWidth; 
+    canvas.height = canvas.clientHeight; 
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+let hue = 260;
+let bars = Array.from({length: 60}, () => Math.random() * canvas.height);
+let animating = false;
+
+function draw() {
+    if (!animating) { ctx.clearRect(0, 0, canvas.width, canvas.height); return; }
+    requestAnimationFrame(draw);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const barWidth = canvas.width / bars.length;
+    let x = 0;
+    for (let i = 0; i < bars.length; i++) {
+        bars[i] += (Math.random() - 0.5) * 5;
+        if (bars[i] < 5) bars[i] = 5;
+        if (bars[i] > canvas.height) bars[i] = canvas.height;
+        ctx.fillStyle = (i % 2 === 0) ? `hsl(${hue}, 80%, 60%)` : `hsl(${hue + 60}, 80%, 60%)`;
+        ctx.fillRect(x, canvas.height - bars[i], barWidth - 2, bars[i]);
+        x += barWidth;
+    }
+    hue += 0.5; if (hue > 360) hue = 0;
+}
+radioPlayer.addEventListener('play', () => { animating = true; draw(); });
+radioPlayer.addEventListener('pause', () => { animating = false; ctx.clearRect(0, 0, canvas.width, canvas.height); });
+</script>
 </body>
+</html>
